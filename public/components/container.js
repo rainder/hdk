@@ -32,16 +32,16 @@ export const mount = (app) => app.component('container', {
             <div class="row">
               <div class="col-6 mb-3">
                 <label>Private key</label>
-                <textarea class="form-control" readonly>{{ uint8ArrayToHex(pkd.privateKey) }}</textarea>
+                <textarea class="form-control" readonly @focus="outputFocus = 1" @blur="outputFocus = null">{{ mask(uint8ArrayToHex(pkd.privateKey), outputFocus !== 1) }}</textarea>
               </div>
               <div class="col-6 mb-3">
                 <label>Chain Code</label>
-                <textarea class="form-control" readonly>{{ uint8ArrayToHex(pkd.chainCode) }}</textarea>
+                <textarea class="form-control" readonly @focus="outputFocus = 2" @blur="outputFocus = null">{{ mask(uint8ArrayToHex(pkd.chainCode), outputFocus !== 2) }}</textarea>
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
-                <textarea rows="1" class="form-control" readonly>{{ pkd }}</textarea>
+                <textarea rows="1" class="form-control" readonly @focus="outputFocus = 3" @blur="outputFocus = null">{{ mask(pkd.toString(), outputFocus !== 3) }}</textarea>
               </div>
             </div>
           </div>
@@ -54,6 +54,7 @@ export const mount = (app) => app.component('container', {
     branches: [],
     showField: -1,
     pkd: new PrivateKeyDerivation(),
+    outputFocus: null,
   }),
   computed: {
     numBranches() {
@@ -61,6 +62,9 @@ export const mount = (app) => app.component('container', {
     },
   },
   methods: {
+    mask(input, mask) {
+      return mask ? input.replace(/./g, '*') : input;
+    },
     async calculateKeys() {
       this.pkd = new PrivateKeyDerivation();
 
