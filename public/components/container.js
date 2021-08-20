@@ -20,7 +20,7 @@ export const mount = (app) => app.component('container', {
                   <li><a class="dropdown-item" href="#" @click="branchTypes[index - 1] = 'hex'">hex</a></li>
                   <li><a class="dropdown-item" href="#" @click="branchTypes[index - 1] = 'number'">number</a></li>
                 </ul>
-                <input :type="showField === index ? 'text' : 'password'" class="form-control" v-model="branches[index - 1]" :tabindex="index"/>
+                <input :type="showField === index ? 'text' : 'password'" class="form-control font-awesome" v-model="branches[index - 1]" :tabindex="index"/>
                 <button class="btn btn-outline-secondary" type="button" @click="showField = showField === index ? -1 : index" @mouseleave="showField = -1">
                   <template v-if="showField === index">◎</template>
                   <template v-else>◉</template>
@@ -32,18 +32,20 @@ export const mount = (app) => app.component('container', {
             <div class="row">
               <div class="col-6 mb-3">
                 <label>Private key</label>
-                <textarea class="form-control" readonly @focus="outputFocus = 1" @blur="outputFocus = null">{{ mask(uint8ArrayToHex(pkd.privateKey), outputFocus !== 1) }}</textarea>
+                <textarea class="form-control font-awesome" readonly @focus="outputFocus ^= 1" @blur="outputFocus ^= 1">{{ mask(uint8ArrayToHex(pkd.privateKey), outputFocus & 1) }}</textarea>
               </div>
               <div class="col-6 mb-3">
                 <label>Chain Code</label>
-                <textarea class="form-control" readonly @focus="outputFocus = 2" @blur="outputFocus = null">{{ mask(uint8ArrayToHex(pkd.chainCode), outputFocus !== 2) }}</textarea>
+                <textarea class="form-control font-awesome" readonly @focus="outputFocus ^= 2" @blur="outputFocus ^= 2">{{ mask(uint8ArrayToHex(pkd.chainCode), outputFocus & 2) }}</textarea>
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
-                <textarea rows="1" class="form-control" readonly @focus="outputFocus = 3" @blur="outputFocus = null">{{ mask(pkd.toString(), outputFocus !== 3) }}</textarea>
+                <textarea rows="1" class="form-control font-awesome" readonly @focus="outputFocus ^= 4" @blur="outputFocus ^= 4">{{ mask(pkd.toString(), outputFocus & 4) }}</textarea>
               </div>
             </div>
+            
+            <a href="#" @click.prevent="outputFocus ^= 7">Toggle output visibility</a>
           </div>
        
       </div>
@@ -54,7 +56,7 @@ export const mount = (app) => app.component('container', {
     branches: [],
     showField: -1,
     pkd: new PrivateKeyDerivation(),
-    outputFocus: null,
+    outputFocus: 0,
   }),
   computed: {
     numBranches() {
@@ -62,8 +64,8 @@ export const mount = (app) => app.component('container', {
     },
   },
   methods: {
-    mask(input, mask) {
-      return mask ? input.replace(/./g, '*') : input;
+    mask(input, unmask) {
+      return unmask ? input : input.replace(/./g, '*');
     },
     async calculateKeys() {
       this.pkd = new PrivateKeyDerivation();
