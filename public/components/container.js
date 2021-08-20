@@ -76,6 +76,12 @@ export const mount = (app) => app.component('container', {
     },
   },
   watch: {
+    branchTypes: {
+      deep: true,
+      handler() {
+        this.calculateKeys();
+      },
+    },
     branches: {
       deep: true,
       immediate: true,
